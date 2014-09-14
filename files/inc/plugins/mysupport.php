@@ -1728,7 +1728,7 @@ function mysupport_postbit(&$post)
 			}
 		}
 		
-		if($thread['issupportthread'] == 1)
+		if($thread['issupportthread'] == 1 && $thread['firstpost'] == $post['pid'])
 		{
 			$post['mysupport_status'] = mysupport_get_display_status($thread['status'], $thread['onhold'], $thread['statustime'], $thread['uid']);
 		}
