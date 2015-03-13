@@ -32,8 +32,7 @@ function mysupport_do_info()
 		'author' => 'MattRogowski',
 		'authorsite' => 'http://mattrogowski.co.uk/mybb/',
 		'version' => MYSUPPORT_VERSION,
-		'compatibility' => '16*',
-		'guid' => '3ebe16a9a1edc67ac882782d41742330'
+		'compatibility' => '18*'
 	);
 }
 
@@ -64,8 +63,7 @@ function mysupport_do_install()
 		"name" => "mysupport",
 		"title" => "MySupport Settings",
 		"description" => "Settings for the MySupport plugin.",
-		"disporder" => "28",
-		"isdefault" => "no"
+		"disporder" => "28"
 	);
 	$db->insert_query("settinggroups", $settings_group);
 	
@@ -191,14 +189,12 @@ function mysupport_do_activate()
 	mysupport_template_edits(0);
 	
 	mysupport_template_edits(1);
-	
+
 	mysupport_upgrade();
 }
 
 function mysupport_do_deactivate()
 {
-	global $cache;
-	
 	mysupport_template_edits(0);
 	
 	mysupport_cache("version");
@@ -221,7 +217,7 @@ function mysupport_upgrade()
 	}
 	
 	// only need to run through this if the version has actually changed
-	if(!empty($old_version) && $old_version < MYSUPPORT_VERSION)
+	if(!empty($old_version) && $old_version < MYSUPPORT_VERSION || defined('MYSUPPORT_FORCE_UPDATE'))
 	{
 		// reimport the settings to add any new ones and refresh the current ones
 		mysupport_import_settings();
@@ -314,6 +310,10 @@ function mysupport_table_columns($action = 0)
 			),
 			"mysupportmove" => array(
 				"size" => 1
+			),
+			"mysupportdenial" => array(
+				"size" => 1,
+				"default" => 1
 			),
 			"technicalthreads" => array(
 				"size" => 5
@@ -448,7 +448,7 @@ function mysupport_insert_task()
 {
 	global $db, $lang;
 	
-	$lang->load("mysupport");
+	$lang->load("config_mysupport");
 	
 	include_once MYBB_ROOT . "inc/functions_task.php";
 	$new_task = array(
@@ -1036,6 +1036,7 @@ function mysupport_do_templates($type, $master_only = false)
 			{\$modcp_nav}
 			<td valign=\"top\">
 				{\$deny_support}
+				{\$multipage}
 			</td>
 		</tr>
 	</table>
