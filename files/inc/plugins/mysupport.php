@@ -533,7 +533,7 @@ function mysupport_showthread()
 			{
 				if($mybb->input['mysupport_full'])
 				{
-					$categories = mysupport_get_categories($forum);
+					$categories = mysupport_get_categories($fid);
 					if(!empty($categories))
 					{
 						$categories_list .= "<label for=\"category\">".$lang->category."</label> <select name=\"category\">\n";
@@ -873,7 +873,7 @@ function mysupport_close_more_box()
 		// setting a category
 		if($category != 0)
 		{
-			$categories = mysupport_get_categories($forum);
+			$categories = mysupport_get_categories($fid);
 			if(!array_key_exists($category, $categories) && $category != "-1")
 			{
 				mysupport_error($lang->category_invalid);
@@ -1094,7 +1094,7 @@ function mysupport_forumdisplay_searchresults()
 		}
 		$mysupport_priority_classes .= "</style>\n";
 	}
-	
+
 	$mysupport_forums = mysupport_forums();
 	// if we're viewing a forum which has MySupport enabled, or we're viewing search results and there's at least 1 MySupport forum, show the MySupport options in the inline moderation menu
 	if((THIS_SCRIPT == "forumdisplay.php" && mysupport_forum($mybb->input['fid'])) || (THIS_SCRIPT == "search.php" && !empty($mysupport_forums)))
@@ -1253,13 +1253,13 @@ function mysupport_inline_thread_moderation()
 	}
 	
 	$mysupport_categories = "";
-	$categories_users = mysupport_get_categories($foruminfo['fid']);
+	$categories_users = mysupport_get_categories($mybb->get_input('fid', 1));
 	// only continue if there's any priorities
 	if(!empty($categories_users))
 	{
 		foreach($categories_users as $category_id => $category_name)
 		{
-			$mysupport_categories .= "<option value=\"mysupport_priority_".intval($category_id)."\">-- ".htmlspecialchars_uni($category_name)."</option>\n";
+			$mysupport_categories .= "<option value=\"mysupport_category_".intval($category_id)."\">-- ".htmlspecialchars_uni($category_name)."</option>\n";
 		}
 	}
 	
@@ -1279,7 +1279,7 @@ function mysupport_do_inline_thread_moderation()
 	
 	verify_post_check($mybb->input['my_post_key']);
 	
-	global $db, $cache, $lang, $mod_log_action, $redirect;
+	global $db, $cache, $lang, $mod_log_action, $redirect, $forum;
 	
 	$lang->load("mysupport");
 	
@@ -1468,7 +1468,7 @@ function mysupport_do_inline_thread_moderation()
 		}
 		else
 		{
-			$categories = mysupport_get_categories($forum);
+			$categories = mysupport_get_categories($fid);
 			if(!array_key_exists($category, $categories) && $category != "-1")
 			{
 				mysupport_error($lang->category_invalid);
@@ -4155,45 +4155,48 @@ function mysupport_get_assign_users()
  * @param array Info on the forum.
  * @return array Array of available categories.
 **/
-function mysupport_get_categories($forum)
+function mysupport_get_categories($fid)
 {
-	global $mybb, $db;
+	global $mybb, $db, $forum_cache;
 	
 	$forums_concat_sql = $groups_concat_sql = "";
-	
-	$parent_list = explode(",", $forum['parentlist']);
-	foreach($parent_list as $parent)
+	$forum_cache or cache_forums();
+
+	if(empty($forum_cache[$fid]))
 	{
-		if(!empty($forums_concat_sql))
+		$fid = 0;
+	}
+	/*else
+	{
+		$forum = $forum_cache[$fid];
+	}
+
+	$fids = array($fid);
+	if(!empty($forum['parentlist']))
+	{
+		$fids = explode(',', $forum['parentlist']);
+	}*/
+
+	$threadprefixes = build_prefixes();
+	foreach($threadprefixes as $prefix)
+	{
+		/*if($prefix['forums'] != -1 && !is_member($prefix['forums'], array('usergroup' => $fid, 'additionalgroups' => $fids)))
 		{
-			$forums_concat_sql .= " OR ";
-		}
-		$forums_concat_sql .= "CONCAT(',',forums,',') LIKE '%,".intval($parent).",%'";
-	}
-	$forums_concat_sql = "(".$forums_concat_sql." OR forums = '-1')";
-	
-	$usergroup_list = $mybb->user['usergroup'];
-	if(!empty($mybb->user['additionalgroups']))
-	{
-		$usergroup_list .= ",".$mybb->user['additionalgroups'];
-	}
-	$usergroup_list = explode(",", $usergroup_list);
-	foreach($usergroup_list as $usergroup)
-	{
-		if(!empty($groups_concat_sql))
+			continue;
+		}*/
+		if($prefix['forums'] != -1 && strpos(','.$prefix['forums'].',', ','.$fid.',') === false)
 		{
-			$groups_concat_sql .= " OR ";
+			continue;
 		}
-		$groups_concat_sql .= "CONCAT(',',groups,',') LIKE '%,".intval($usergroup).",%'";
+
+		if($prefix['groups'] != -1 && !is_member($prefix['groups']))
+		{
+			continue;
+		}
+
+		$categories[$prefix['pid']] = $prefix['prefix'];
 	}
-	$groups_concat_sql = "(".$groups_concat_sql." OR groups = '-1')";
-	
-	$query = $db->simple_select("threadprefixes", "pid, prefix", "{$forums_concat_sql} AND {$groups_concat_sql}");
-	$categories = array();
-	while($category = $db->fetch_array($query))
-	{
-		$categories[$category['pid']] = $category['prefix'];
-	}
+
 	return $categories;
 }
 
