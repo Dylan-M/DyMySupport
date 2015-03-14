@@ -862,33 +862,34 @@ function mysupport_do_templates($type, $master_only = false)
 		);
 		$templates[] = array(
 			"title" => "mysupport_form_ajax",
-			"template" => "<div class=\"mysupport_showthread_more_box\">
-<form action=\"showthread.php\" method=\"post\" style=\"display: inline;\">
-	<input type=\"hidden\" name=\"tid\" value=\"{\$tid}\" />
-	<input type=\"hidden\" name=\"action\" value=\"mysupport\" />
-	<input type=\"hidden\" name=\"via_form\" value=\"1\" />
-	<input type=\"hidden\" name=\"my_post_key\" value=\"{\$mybb->post_code}\" />
-	<table border=\"0\" cellspacing=\"{\$theme['borderwidth']}\" cellpadding=\"{\$theme['tablespace']}\" class=\"tborder\" style=\"width: 250px;\">
+			"template" => '<div class="modal">
+	<div style="overflow-y: auto; max-height: 400px;">
+<form action="{$mybb->settings[\'bburl\']}/showthread.php" method="post">
+	<input type="hidden" name="tid" value="{$tid}" />
+	<input type="hidden" name="action" value="mysupport" />
+	<input type="hidden" name="via_form" value="1" />
+	<input type="hidden" name="my_post_key" value="{$mybb->post_code}" />
+	<table border="0" cellspacing="{$theme[\'borderwidth\']}" cellpadding="{$theme[\'tablespace\']}" class="tborder">
 		<tr>
-			<td class=\"thead\" align=\"center\">
-				<strong>{\$lang->mysupport_additional_options}</strong>
+			<td class="thead" align="center">
+				<strong>{$lang->mysupport_additional_options}</strong>
 			</td>
 		</tr>
-		{\$status_list}
-		{\$assigned_list}
-		{\$priorities_list}
-		{\$categories_list}
-		{\$on_hold}
-		{\$is_support_thread}
+		{$status_list}
+		{$assigned_list}
+		{$priorities_list}
+		{$categories_list}
+		{$on_hold}
+		{$is_support_thread}
 		<tr>
-			<td class=\"tfoot\" align=\"center\">
-				<input type=\"submit\" value=\"{\$lang->update}\" /> <input type=\"button\" value=\"{\$lang->close_options}\" onclick=\"mysupport_close_more_box();\" />
+			<td class="tfoot" align="center">
+				<input type="submit" class="button" value="{$lang->update}" />
 			</td>
 		</tr>
 	</table>
 </form>
-</div>
-<br />"
+	</div>
+</div>'
 		);
 		$templates[] = array(
 			"title" => "mysupport_tab",
@@ -1355,15 +1356,6 @@ function mysupport_stylesheet($action = 0)
 
 .mysupport_tab_misc a {
 	color: #555555;
-}
-
-.mysupport_showthread_more_box {
-	width: 250px;
-	position: fixed;
-	top: 25%;
-	left: 50%;
-	margin-left: -125px;
-	z-index: 1000;
 }
 
 .mysupport_bar_solved {

@@ -584,39 +584,15 @@ function mysupport_showthread()
 			
 			if($show_more_link)
 			{
-				$mysupport_js = "<div id=\"mysupport_showthread_more_box\" style=\"display: none;\"></div>
-<script type=\"text/javascript\">
-function mysupport_more_link()
-{
-	var url = '{$mybb->settings['bburl']}/showthread.php?tid={$tid}&mysupport_full=1';
-	
-	new Ajax.Request(url+'&ajax=1', {
-		method: 'get',
-		onSuccess: function(data) {
-			if(data.responseText != '')
-			{
-				$('mysupport_showthread_more_box').style.display = '';
-				$('mysupport_showthread_more_box').innerHTML = data.responseText;
-			}
-			else
-			{
-				window.location = url;
-			}
-		}
-	});
-}
+				$thread_url = $mybb->settings['bburl'].'/'.get_thread_link($tid);
+				$thread_url .= (strpos('?', $thread_url) ? '?' : '&').'mysupport_full=1';
 
-function mysupport_close_more_box()
-{
-	$('mysupport_showthread_more_box').style.display = 'none';
-	$('mysupport_showthread_more_box').innerHTML = '';
-}
-</script>";
+				$mysupport_js = '';
 				
 				$text = $lang->mysupport_tab_more;
 				$class = "mysupport_tab_misc";
-				$url = $mybb->settings['bburl']."/showthread.php?tid={$tid}&amp;mysupport_full=1";
-				$onclick = " onclick=\"mysupport_more_link(); return false\"";
+				$url = 'javascript:void(0);';
+				$onclick = ' onclick="MyBB.popupWindow(\''.$thread_url.'&ajax=1\', null, true); return false;"';
 				eval("\$mysupport_options .= \"".$templates->get('mysupport_tab')."\";");
 			}
 		}
@@ -635,9 +611,11 @@ function mysupport_close_more_box()
 			{
 				if($mybb->input['ajax'] == 1)
 				{
-					eval("\$mysupport_options = \"".$templates->get('mysupport_form_ajax')."\";");
+					eval("\$mysupport_options = \"".$templates->get('mysupport_form_ajax', 1, 0)."\";");
 					// this is an AJAX request, echo and exit, GO GO GO
+
 					echo $mysupport_options;
+
 					exit;
 				}
 				else
