@@ -38,7 +38,7 @@ $plugins->add_hook("editpost_start", "mysupport_thread_info");
 $plugins->add_hook("fetch_wol_activity_end", "mysupport_friendly_wol");
 $plugins->add_hook("forumdisplay_start", "mysupport_forumdisplay_searchresults");
 $plugins->add_hook("forumdisplay_thread", "mysupport_threadlist_thread");
-$plugins->add_hook("global_start", "mysupport_notices");
+$plugins->add_hook("global_intermediate", "mysupport_notices");
 $plugins->add_hook("member_profile_end", "mysupport_profile");
 $plugins->add_hook("modcp_start", "mysupport_modcp_support_denial");
 $plugins->add_hook("modcp_start", "mysupport_navoption", -10);

@@ -900,7 +900,7 @@ function mysupport_do_templates($type, $master_only = false)
 		);
 		$templates[] = array(
 			"title" => "mysupport_status_image",
-			"template" => "<img src=\"{\$mybb->settings['bburl']}/{\$theme['imgdir']}/mysupport_{\$status_img}.png\" alt=\"{\$status_title}\" title=\"{\$status_title}\" /> "
+			"template" => "<img src=\"{\$theme['imgdir']}/mysupport_{\$status_img}.png\" alt=\"{\$status_title}\" title=\"{\$status_title}\" /> "
 		);
 		$templates[] = array(
 			"title" => "mysupport_status_text",
@@ -1008,11 +1008,11 @@ function mysupport_do_templates($type, $master_only = false)
 		);
 		$templates[] = array(
 			"title" => "mysupport_assigned",
-			"template" => "<img src=\"{\$mybb->settings['bburl']}/{\$theme['imgdir']}/mysupport_assigned.png\" alt=\"{\$lang->assigned}\" title=\"{\$lang->assigned}\" />"
+			"template" => "<img src=\"{\$theme['imgdir']}/mysupport_assigned.png\" alt=\"{\$lang->assigned}\" title=\"{\$lang->assigned}\" />"
 		);
 		$templates[] = array(
 			"title" => "mysupport_assigned_toyou",
-			"template" => "<a href=\"{\$mybb->settings['bburl']}/usercp.php?action=assignedthreads\" target=\"_blank\"><img src=\"{\$mybb->settings['bburl']}/{\$theme['imgdir']}/mysupport_assigned_toyou.png\" alt=\"{\$lang->assigned_toyou}\" title=\"{\$lang->assigned_toyou}\" /></a>"
+			"template" => "<a href=\"{\$mybb->settings['bburl']}/usercp.php?action=assignedthreads\" target=\"_blank\"><img src=\"{\$theme['imgdir']}/mysupport_assigned_toyou.png\" alt=\"{\$lang->assigned_toyou}\" title=\"{\$lang->assigned_toyou}\" /></a>"
 		);
 		$templates[] = array(
 			"title" => "mysupport_deny_support_post",
@@ -1404,7 +1404,8 @@ function mysupport_stylesheet($action = 0)
 .modcp_nav_deny_support {
 	background: url(images/mysupport_no_support.gif) no-repeat left center;
 }";
-	
+
+	require_once MYBB_ADMIN_DIR . "inc/functions_themes.php";
 	if($action == 1)
 	{
 		$insert = array(
@@ -1420,6 +1421,8 @@ function mysupport_stylesheet($action = 0)
 			"cachefile" => "css.php?stylesheet=" . intval($sid)
 		);
 		$db->update_query("themestylesheets", $update, "sid = '{$sid}'");
+
+		cache_stylesheet(1, $update['cachefile'], $stylesheet);
 	}
 	elseif($action == 2)
 	{
@@ -1440,11 +1443,13 @@ function mysupport_stylesheet($action = 0)
 	if($action == 1 || $action == -1)
 	{
 		$query = $db->simple_select("themes", "tid");
-		require_once MYBB_ADMIN_DIR . "inc/functions_themes.php";
 		while($tid = $db->fetch_field($query, "tid"))
 		{
+			if($action != -1)
+			{
+				cache_stylesheet($tid, "css.php?stylesheet=".(int)$sid, $stylesheet);
+			}
 			update_theme_stylesheet_list($tid);
 		}
 	}
 }
-?>
