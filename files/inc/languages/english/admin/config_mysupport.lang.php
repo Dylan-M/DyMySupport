@@ -7,6 +7,9 @@
 **/
 
 $l['mysupport'] = "MySupport";
+
+$l['mysupport_task_description'] = "MySupport Task";
+
 $l['solved'] = "Solved";
 $l['not_solved'] = "Not Solved";
 $l['technical'] = "Technical";
@@ -59,6 +62,8 @@ $l['mysupport_description'] = "Description";
 $l['mysupport_view_threads'] = "View Threads";
 
 $l['mysupport_forums'] = "Where to enable MySupport??";
+$l['mysupportdenial_forums'] = "Where to enable MySupport Denial??";
+$l['mysupportdenial_forums_desc'] = "Note that this only affects forums where MySupport is enabled in above setting.";
 $l['mysupport_move_forum'] = "Where to move threads when solved??";
 $l['mysupport_move_forum_desc'] = "<strong>Note:</strong> if a thread is moved when it is marked as solved, 'unsolving' the thread will <strong>not</strong> move the thread back to it's original forum.";
 $l['mysupport_canmarksolved'] = "Who can mark threads as solved??";
